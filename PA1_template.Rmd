@@ -1,21 +1,92 @@
+Reproducible Research: Peer Assessment 1
+=======================
+
 ---
 title: "Reproducible Research: Peer Assessment 1"
+author: patrick charles
 output: 
   html_document:
     keep_md: true
 ---
 
 
+## Loading prerequisite libraries
+
+```{r}
+    library(ggplot2)
+    library(dplyr)
+```
+
+
 ## Loading and preprocessing the data
 
+The activity monitoring data unzipped and loaded from csv into a dataframe.
+A dplyr pipeline is used to clean up the data, reformatting date fields.
+Data is grouped by date and a second dataset is created with daily step totals.
+```{r}
+    unzip("activity.zip")
+    steps <- read.csv("activity.csv")
+    tdf.steps = tbl_df(steps)
+    tdf.filtered <- tdf.steps %>% mutate(date = as.Date(date))
+    tdf.dailysteps <-
+        tdf.filtered %>%
+            group_by(date) %>%
+                mutate(sum = sum(steps, na.rm=T)) %>%
+                  summarize(totalsteps=sum(steps))
+```
 
 
 ## What is mean total number of steps taken per day?
 
+### Here's a histogram of step totals by number of occurrences
+The daily step total data is used to create the histogram.
+```{r}
+    ggplot(tdf.dailysteps, aes(x=totalsteps)) +
+        geom_histogram(binwidth=2000) +
+        xlab("Number of Steps Per Day") +
+        ylab("Number of Occurrences")
+```
+
+### We can calculate some statistics on the daily step totals
+```{r}
+    meansteps <- as.integer(mean(tdf.dailysteps$totalsteps, na.rm=T))
+    mediansteps <- median(tdf.dailysteps$totalsteps, na.rm=T)
+```
+The mean of the number of steps per day is **`r meansteps`**.  
+The median number of steps per day is **`r mediansteps`**.
 
 
 ## What is the average daily activity pattern?
 
+A new dataset is created which groups the totals by interval and
+averages across all days:
+```{r}
+    tdf.intervals <-
+        tdf.filtered %>%
+            group_by(interval) %>%
+                mutate(average = mean(steps, na.rm=T)) %>%
+                  summarize(totalsteps=sum(steps, na.rm=T))
+```
+
+### Average steps by 5-minute interval
+A time series plot of the 5-minute intervals vs average steps is created:
+```{r}
+    ggplot(tdf.intervals, aes(x=interval, y=totalsteps)) +
+        geom_line() + 
+        xlab("Daily Time Interval") +
+        ylab("Average Number of Steps")
+```
+
+### Maximum average step count by 5-minute interval
+We can find the highest average steps and the associated interval.
+```{r}
+  maxsteps <- max(tdf.intervals$totalsteps)
+  maxinterval <- subset(tdf.intervals,
+                        totalsteps == max(tdf.intervals$totalsteps))$interval
+```
+
+The interval containing the highest number of steps
+is **`r maxinterval`** containing **`r maxsteps`** steps on average
 
 
 ## Imputing missing values
@@ -23,3 +94,4 @@ output:
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
