@@ -1,1 +1,7 @@
 activity.csv
+
+## generated files.
+## normally, these would be ignored, but required for submission
+#figures/
+#*.html
+#*.md
