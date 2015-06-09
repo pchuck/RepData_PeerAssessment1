@@ -6,8 +6,10 @@ output:
         keep_md: true
 ---
 
-Reproducible Research: Peer Assessment 1
-=======================
+# Step Activity Data Analysis
+- Course: Reproducible Research (repdata-013)
+- Project: Course Project 1
+- Author: Patrick Charles
 
 
 
